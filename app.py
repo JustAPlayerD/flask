@@ -1,18 +1,27 @@
-from flask import Flask
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-@app.route("/")
-def home():
-    return "Hello Flask"
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-@app.route("/test")
-def test():
-    return "This is test"
+@app.route('/button-click', methods=['POST'])
+def button_click():
+    data = request.json
+    button_value = data.get('button')
 
-@app.route("/html")
-def html():
-    return render_template('/home.html')
+    # 你可以根據按鈕的值執行對應動作
+    if button_value == 'A':
+        result = '你按下了 A，執行動作 1'
+    elif button_value == 'B':
+        result = '你按下了 B，執行動作 2'
+    elif button_value == 'C':
+        result = '你按下了 C，執行動作 3'
+    else:
+        result = '未知按鈕'
 
-if __name__ == "__main__":
-    app.run()
+    return jsonify({'message': result})
+
+if __name__ == '__main__':
+    app.run(debug=True)
