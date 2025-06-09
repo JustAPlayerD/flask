@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask 按鈕範例</title>
+</head>
+<body>
+    <h1>按下按鈕來執行對應 Python 程式</h1>
+
+    <button onclick="sendData('A')">按鈕 A</button>
+    <button onclick="sendData('B')">按鈕 B</button>
+    <button onclick="sendData('C')">按鈕 C</button>
+
+    <p id="response"></p>
+
+    <script>
+        function sendData(value) {
+            fetch('/button-click', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ button: value })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = data.message;
+            });
+        }
+    </script>
+</body>
+</html>
