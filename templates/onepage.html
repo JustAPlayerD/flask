@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>生活資訊站</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{{ url_for('static', filename='w3.css') }}">
+</head>
+<body>
+
+<!-- Navbar (sit on top) -->
+<div class="w3-top">
+  <div class="w3-bar w3-white w3-wide w3-padding w3-card">
+    <a href="#home" class="w3-bar-item w3-button"><b>生活</b> 資訊</a>
+    <!-- Float links to the right. Hide them on small screens -->
+    <div class="w3-right w3-hide-small">
+      <a href="#currency" class="w3-bar-item w3-button">貨幣幣值</a>
+      <a href="#invoice" class="w3-bar-item w3-button">發票兌獎</a>
+      <a href="#projects" class="w3-bar-item w3-button">即時影像</a>
+      <a href="#mail" class="w3-bar-item w3-button">寄信</a>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="w3-display-container w3-content w3-wide" style="max-width:1500px;" id="home">
+  <img class="w3-image" src="{{ url_for('static', filename='bluesky_ps.png') }}" alt="封面" width="1500" height="800">
+  <div class="w3-display-middle w3-margin-top w3-center">
+    <h1 class="w3-xxlarge w3-text-white"><span class="w3-padding w3-black w3-opacity-min"><b>生活</b></span> <span class="w3-hide-small w3-text-light-grey">資訊</span></h1>
+  </div>
+</header>
+
+<div class="w3-center w3-container w3-padding-32 w3-xxlarge" id="currency">
+    <h1 class="w3-center w3-jumbo" style="margin-bottom:16px">貨幣幣值</h1>
+    <table class="w3-table-all  w3-xxlarge">
+    <tr>
+      <th>幣別</th>
+      <th>買入價格</th>
+      <th>買出價格</th>
+    </tr>
+    <tr>
+      <td>{{ crt1[0] }}</td>
+      <td>{{ crt1[2] }}</td>
+      <td>{{ crt1[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt2[0] }}</td>
+      <td>{{ crt2[2] }}</td>
+      <td>{{ crt2[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt3[0] }}</td>
+      <td>{{ crt3[2] }}</td>
+      <td>{{ crt3[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt4[0] }}</td>
+      <td>{{ crt4[2] }}</td>
+      <td>{{ crt4[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt5[0] }}</td>
+      <td>{{ crt5[2] }}</td>
+      <td>{{ crt5[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt6[0] }}</td>
+      <td>{{ crt6[2] }}</td>
+      <td>{{ crt6[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt7[0] }}</td>
+      <td>{{ crt7[2] }}</td>
+      <td>{{ crt7[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt8[0] }}</td>
+      <td>{{ crt8[2] }}</td>
+      <td>{{ crt8[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt9[0] }}</td>
+      <td>{{ crt9[2] }}</td>
+      <td>{{ crt9[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt10[0] }}</td>
+      <td>{{ crt10[2] }}</td>
+      <td>{{ crt10[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt11[0] }}</td>
+      <td>{{ crt11[2] }}</td>
+      <td>{{ crt11[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt12[0] }}</td>
+      <td>{{ crt12[2] }}</td>
+      <td>{{ crt12[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt13[0] }}</td>
+      <td>{{ crt13[2] }}</td>
+      <td>{{ crt13[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt14[0] }}</td>
+      <td>{{ crt14[2] }}</td>
+      <td>{{ crt14[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt15[0] }}</td>
+      <td>{{ crt15[2] }}</td>
+      <td>{{ crt15[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt16[0] }}</td>
+      <td>{{ crt16[2] }}</td>
+      <td>{{ crt16[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt17[0] }}</td>
+      <td>{{ crt17[2] }}</td>
+      <td>{{ crt17[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt18[0] }}</td>
+      <td>{{ crt18[2] }}</td>
+      <td>{{ crt18[12] }}</td>
+    </tr>
+    <tr>
+      <td>{{ crt19[0] }}</td>
+      <td>{{ crt19[2] }}</td>
+      <td>{{ crt19[12] }}</td>
+    </tr>
+  </table>
+
+  <div class="w3-container w3-padding-32 w3-xxlarge" id="invoice">
+  <div class="w3-content">
+  
+    <h1 class="w3-center w3-jumbo" style="margin-bottom:16px">發票兌獎</h1>
+    <div class="w3-row w3-center w3-border w3-border-dark-grey">
+      <a href="javascript:void(0)" onclick="openMenu(event, 'Pizza');" id="myLink">
+        <div class="w3-col s4 tablink w3-padding-large w3-hover-blue">{{ issue1 }}</div>
+      </a>
+      <a href="javascript:void(0)" onclick="openMenu(event, 'Pasta');">
+        <div class="w3-col s4 tablink w3-padding-large w3-hover-blue">{{ issue2 }}</div>
+      </a>
+      <a href="javascript:void(0)" onclick="openMenu(event, 'Starter');">
+        <div class="w3-col s4 tablink w3-padding-large w3-hover-blue">{{ issue3 }}</div>
+      </a>
+    </div>
+
+    <div id="Pizza" class="w3-container menu w3-padding-32 w3-white">
+      <h2><b>兌獎期間：{{ redeem1 }}</b></h2>
+      <hr>
+      <h1><b>特別獎</b> <span class="w3-tag w3-grey w3-round">1000萬</span></h1>
+      <p class="w3-text-red"><b>{{ invoice11 }}</b></p>
+      <h2>同期統一發票收執聯8位數號碼與特別獎號碼相同者中獎</h2>
+      <hr>
+
+      <h1><b>特獎</b> <span class="w3-tag w3-grey w3-round">200萬</span></h1>
+      <p class="w3-text-red"><b>{{ invoice12 }}</b></p>
+      <h2>同期統一發票收執聯8位數號碼與特獎號碼相同者中獎</h2>
+      <hr>
+
+      <h1><b>頭獎</b> <span class="w3-tag w3-grey w3-round">20萬~2百</span></h1>
+      <p class="w3-text-black"><b>{{ invoice13[0:5] }}<span style="color: red;">{{ invoice13[5:8] }}</span></b></p>
+      <hr>
+      <p class="w3-text-black"><b>{{ invoice14[0:5] }}<span style="color: red;">{{ invoice14[5:8] }}</span></b></p>
+      <hr>
+      <p class="w3-text-black"><b>{{ invoice15[0:5] }}<span style="color: red;">{{ invoice15[5:8] }}</span></b></p>
+      <h2>同期統一發票收執聯8位數號碼與特獎號碼相同者中獎<span style="color: red;">20萬</span></h2>
+      <h2>同期統一發票收執聯7位數號碼與特獎號碼相同者中獎<span style="color: red;">4萬</span></h2>
+      <h2>同期統一發票收執聯6位數號碼與特獎號碼相同者中獎<span style="color: red;">1萬</span></h2>
+      <h2>同期統一發票收執聯5位數號碼與特獎號碼相同者中獎<span style="color: red;">4千</span></h2>
+      <h2>同期統一發票收執聯4位數號碼與特獎號碼相同者中獎<span style="color: red;">1千</span></h2>
+      <h2>同期統一發票收執聯3位數號碼與特獎號碼相同者中獎<span style="color: red;">2百</span></h2>
+      
+    </div>
+
+    <div id="Pasta" class="w3-container menu w3-padding-32 w3-white">
+      <h2><b>兌獎期間：{{ redeem2 }}</b></h2>
+      <hr>
+      <h1><b>特別獎</b> <span class="w3-tag w3-grey w3-round">1000萬</span></h1>
+      <p class="w3-text-red"><b>{{ invoice21 }}</b></p>
+      <h2>同期統一發票收執聯8位數號碼與特別獎號碼相同者中獎</h2>
+      <hr>
+
+      <h1><b>特獎</b> <span class="w3-tag w3-grey w3-round">200萬</span></h1>
+      <p class="w3-text-red"><b>{{ invoice22 }}</b></p>
+      <h2>同期統一發票收執聯8位數號碼與特獎號碼相同者中獎</h2>
+      <hr>
+
+      <h1><b>頭獎</b> <span class="w3-tag w3-grey w3-round">20萬~2百</span></h1>
+      <p class="w3-text-black"><b>{{ invoice23[0:5] }}<span style="color: red;">{{ invoice23[5:8] }}</span></b></p>
+      <hr>
+      <p class="w3-text-black"><b>{{ invoice24[0:5] }}<span style="color: red;">{{ invoice24[5:8] }}</span></b></p>
+      <hr>
+      <p class="w3-text-black"><b>{{ invoice25[0:5] }}<span style="color: red;">{{ invoice25[5:8] }}</span></b></p>
+      <h2>同期統一發票收執聯8位數號碼與特獎號碼相同者中獎<span style="color: red;">20萬</span></h2>
+      <h2>同期統一發票收執聯7位數號碼與特獎號碼相同者中獎<span style="color: red;">4萬</span></h2>
+      <h2>同期統一發票收執聯6位數號碼與特獎號碼相同者中獎<span style="color: red;">1萬</span></h2>
+      <h2>同期統一發票收執聯5位數號碼與特獎號碼相同者中獎<span style="color: red;">4千</span></h2>
+      <h2>同期統一發票收執聯4位數號碼與特獎號碼相同者中獎<span style="color: red;">1千</span></h2>
+      <h2>同期統一發票收執聯3位數號碼與特獎號碼相同者中獎<span style="color: red;">2百</span></h2>
+      
+    </div>
+
+
+    <div id="Starter" class="w3-container menu w3-padding-32 w3-white">
+      <h2><b>兌獎期間：{{ redeem3 }}</b></h2>
+      <hr>
+      <h1><b>特別獎</b> <span class="w3-tag w3-grey w3-round">1000萬</span></h1>
+      <p class="w3-text-red"><b>{{ invoice31 }}</b></p>
+      <h2>同期統一發票收執聯8位數號碼與特別獎號碼相同者中獎</h2>
+      <hr>
+
+      <h1><b>特獎</b> <span class="w3-tag w3-grey w3-round">200萬</span></h1>
+      <p class="w3-text-red"><b>{{ invoice32 }}</b></p>
+      <h2>同期統一發票收執聯8位數號碼與特獎號碼相同者中獎</h2>
+      <hr>
+
+      <h1><b>頭獎</b> <span class="w3-tag w3-grey w3-round">20萬~2百</span></h1>
+      <p class="w3-text-black"><b>{{ invoice33[0:5] }}<span style="color: red;">{{ invoice33[5:8] }}</span></b></p>
+      <hr>
+      <p class="w3-text-black"><b>{{ invoice34[0:5] }}<span style="color: red;">{{ invoice34[5:8] }}</span></b></p>
+      <hr>
+      <p class="w3-text-black"><b>{{ invoice35[0:5] }}<span style="color: red;">{{ invoice35[5:8] }}</span></b></p>
+      <h2>同期統一發票收執聯8位數號碼與特獎號碼相同者中獎<span style="color: red;">20萬</span></h2>
+      <h2>同期統一發票收執聯7位數號碼與特獎號碼相同者中獎<span style="color: red;">4萬</span></h2>
+      <h2>同期統一發票收執聯6位數號碼與特獎號碼相同者中獎<span style="color: red;">1萬</span></h2>
+      <h2>同期統一發票收執聯5位數號碼與特獎號碼相同者中獎<span style="color: red;">4千</span></h2>
+      <h2>同期統一發票收執聯4位數號碼與特獎號碼相同者中獎<span style="color: red;">1千</span></h2>
+      <h2>同期統一發票收執聯3位數號碼與特獎號碼相同者中獎<span style="color: red;">2百</span></h2>
+      
+    </div><br>
+
+  </div>
+
+<!-- Page content -->
+<div class="w3-content w3-padding" style="max-width:1564px">
+
+  <!-- Project Section -->
+  <div class="w3-container w3-padding-32" id="projects">
+    <h1 class="w3-center w3-jumbo" style="margin-bottom:16px">即時影像</h1>
+  </div>
+
+  <div class="w3-row-padding">
+    <div class="w3-col l4 m6 w3-margin-bottom">
+      <div class="w3-display-container">
+        <div class="w3-display-topleft w3-black w3-padding-8">大同路二段與健康路一段口</div>
+        <img src="road001.png" alt="House" style="width:100%">
+      </div>
+    </div>
+    <div class="w3-col l4 m6 w3-margin-bottom">
+      <div class="w3-display-container">
+        <div class="w3-display-topleft w3-black w3-padding-8">東門圓環與大同路一段</div>
+        <img src="road002.png" alt="House" style="width:100%">
+      </div>
+    </div>
+    <div class="w3-col l4 m6 w3-margin-bottom">
+      <div class="w3-display-container">
+        <div class="w3-display-topleft w3-black w3-padding-8">望僕號</div>
+        <img src="doulos_hop001.jpg" alt="House" style="width:100%">
+      </div>
+    </div>
+  </div>
+
+  <div class="w3-row-padding">
+    <div class="w3-col l3 m6 w3-margin-bottom">
+      <div class="w3-display-container">
+        <div class="w3-display-topleft w3-black w3-padding">西本願寺</div>
+        <img src="temple001.jpg" alt="House" style="width:99%">
+      </div>
+    </div>
+    <div class="w3-col l3 m6 w3-margin-bottom">
+      <div class="w3-display-container">
+        <div class="w3-display-topleft w3-black w3-padding">Brick House</div>
+        <img src="/w3images/house5.jpg" alt="House" style="width:99%">
+      </div>
+    </div>
+    <div class="w3-col l3 m6 w3-margin-bottom">
+      <div class="w3-display-container">
+        <div class="w3-display-topleft w3-black w3-padding">Renovated</div>
+        <img src="/w3images/house4.jpg" alt="House" style="width:99%">
+      </div>
+    </div>
+    <div class="w3-col l3 m6 w3-margin-bottom">
+      <div class="w3-display-container">
+        <div class="w3-display-topleft w3-black w3-padding">Barn House</div>
+        <img src="/w3images/house3.jpg" alt="House" style="width:99%">
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Section -->
+  <div class="w3-container w3-padding-32" id="mail">
+    <h1 class="w3-center w3-jumbo" style="margin-bottom:16px">回覆</h1>
+    <p>有什麼想對我說的嗎?</p>
+    <p>寫下自己的姓名和內容，姓名輸入匿名(anonymous)也可以。</p>
+    <form action="/" method="post">
+      <input class="w3-input w3-border" type="text" placeholder="姓名(Name)" required name="Name">
+      <input class="w3-input w3-section w3-border" type="text" placeholder="請輸入內容(Comment)" required name="Comment">
+      <button class="w3-button w3-black w3-section" type="submit">
+        <i class="fa fa-paper-plane"></i> 寄出(SEND)
+      </button>
+    </form>
+  </div>
+  <!-- sned message -->  
+  {% if success %}
+  <div class="w3-panel w3-green w3-display-container">
+    <span onclick="this.parentElement.style.display='none'"
+    class="w3-button w3-large w3-display-topright">&times;</span>
+    <p>訊息已成功寄出，謝謝您的回覆！</p>
+  </div>
+  {% endif %}
+  
+<!-- Image of location/map -->
+<div class="w3-container">
+  <img src="{{ url_for('static', filename='sunset001.jpg') }}" class="w3-image" style="width:100%">
+</div>
+
+<!-- End page content -->
+</div>
+
+<!-- Footer -->
+<footer class="w3-center w3-black w3-padding-16">
+  <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
+</footer>
+
+<script>
+// Tabbed Menu
+function openMenu(evt, menuName) {
+  var i, x, tablinks;
+  x = document.getElementsByClassName("menu");
+  for (i = 0; i < x.length; i++) {
+     x[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablink");
+  for (i = 0; i < x.length; i++) {
+     tablinks[i].className = tablinks[i].className.replace(" w3-blue", "");
+  }
+  document.getElementById(menuName).style.display = "block";
+  evt.currentTarget.firstElementChild.className += " w3-blue";
+}
+document.getElementById("myLink").click();
+</script>
+
+</body>
+</html>
