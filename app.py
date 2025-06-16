@@ -18,8 +18,12 @@ app = Flask(__name__)
 def index():
 
     CRdata = currency_rate()
-
-    success = False
+    cr_split = []
+    for i in range(1, 20):
+        if i < len(CRdata):
+            cr_split.append(CRdata[i].split(','))
+        else:
+            cr_split.append(["", ""])   # 預設空資料
 
     data = get_latest_invoice_numbers()
     numbers = []
@@ -36,6 +40,7 @@ def index():
     redeem_periods += [''] * (3 - len(redeem_periods)) # 3期兌換期間字串
 
     reply = []
+    success = False
     if request.method == "POST":
         action = request.form.get("action")
         if action == "check":
@@ -49,21 +54,10 @@ def index():
             success = True
 
     return render_template("onepage.html",
-    crt1 = CRdata[1].split(','), crt2 = CRdata[2].split(','), crt3 = CRdata[3].split(','),
-    crt4 = CRdata[4].split(','), crt5 = CRdata[5].split(','), crt6 = CRdata[6].split(','),
-    crt7 = CRdata[7].split(','), crt8 = CRdata[8].split(','), crt9 = CRdata[9].split(','),
-    crt10 = CRdata[10].split(','), crt11 = CRdata[11].split(','), crt12 = CRdata[12].split(','),
-    crt13 = CRdata[13].split(','), crt14 = CRdata[14].split(','), crt15 = CRdata[15].split(','),
-    crt16 = CRdata[16].split(','), crt17 = CRdata[17].split(','), crt18 = CRdata[18].split(','),
-    crt19 = CRdata[19].split(','),
-    invoice11 = numbers[0], invoice12 = numbers[1],
-    invoice13 = numbers[2], invoice14 = numbers[3], invoice15 = numbers[4],
-    invoice21 = numbers[5], invoice22 = numbers[6],
-    invoice23 = numbers[7], invoice24 = numbers[8], invoice25 = numbers[9],
-    invoice31 = numbers[10], invoice32 = numbers[11],
-    invoice33 = numbers[12], invoice34 = numbers[13], invoice35 = numbers[14],
-    issue1 = periods[0], issue2 = periods[1], issue3 = periods[2],
-    redeem1 = redeem_periods[0], redeem2 = redeem_periods[1], redeem3 = redeem_periods[2],
+    crt = cr_split,
+    invoice = numbers,
+    issue = periods,
+    redeem = redeem_periods,
     success=success, reply = reply)
 
 def invoice_check(number, invoice, month):
