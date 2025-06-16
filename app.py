@@ -21,12 +21,6 @@ def index():
 
     success = False
 
-    if request.method == "POST":
-        name = request.form.get("Name")
-        comment = request.form.get("Comment")
-        send_email(name, comment)
-        success = True
-
     data = get_latest_invoice_numbers()
     numbers = []
     periods = []
@@ -40,6 +34,19 @@ def index():
     numbers += [''] * (15 - len(numbers)) # 3期總共15組號碼
     periods += [''] * (3 - len(periods)) # 3期年和月份
     redeem_periods += [''] * (3 - len(redeem_periods)) # 3期兌換期間字串
+
+    reply = []
+    if request.method == "POST":
+        action = request.form.get("action")
+        if action == "check":
+            input = request.form.get("inputinvoice")
+            month = int(request.form.get("month"))
+            reply = invoice_check(input, numbers, month)
+        elif action == "comment":
+            name = request.form.get("Name")
+            comment = request.form.get("Comment")
+            send_email(name, comment)
+            success = True
 
     return render_template("onepage.html",
     crt1 = CRdata[1].split(','), crt2 = CRdata[2].split(','), crt3 = CRdata[3].split(','),
@@ -57,19 +64,50 @@ def index():
     invoice33 = numbers[12], invoice34 = numbers[13], invoice35 = numbers[14],
     issue1 = periods[0], issue2 = periods[1], issue3 = periods[2],
     redeem1 = redeem_periods[0], redeem2 = redeem_periods[1], redeem3 = redeem_periods[2],
-    success=success)
+    success=success, reply = reply)
 
-def invoice_check():
-    url = 'https://invoice.etax.nat.gov.tw/'
-    web = requests.get(url, timeout=10)
-    web.raise_for_status()
-    web.encoding = 'utf-8'
-    soup = BeautifulSoup(web.text, "html.parser")
-    td = soup.select('.container-fluid')[0].select('.etw-tbiggest')
-    ns = td[0].getText()
-    n1 = td[1].getText()
-    n2 = [td[2].getText()[-8:], td[3].getText()[-8:], td[4].getText()[-8:]]
-    return ns,n1,n2
+def invoice_check(number, invoice, month):
+    ns = invoice[0+5*month]
+    n1 = invoice[1+5*month]
+    n2 = [invoice[2+5*month], invoice[3+5*month], invoice[4+5*month]]
+    if len(number) != 8:
+        return '輸入錯誤，請重新輸入。'
+    try:
+        if number == ns:
+            return '中獎! 特別獎1000萬'
+        elif number == n1:
+            return '中獎! 特獎200萬'
+        else:
+            matched = False
+            for i in n2:
+                if number == i:
+                    return '中獎! 頭獎20萬'
+                    matched = True
+                    break
+                elif number[-7:] == i[-7:]:
+                    return '中獎! 二獎4萬'
+                    matched = True
+                    break
+                elif number[-6:] == i[-6:]:
+                    return '中獎! 三獎1萬'
+                    matched = True
+                    break
+                elif number[-5:] == i[-5:]:
+                    return '中獎! 四獎4千'
+                    matched = True
+                    break
+                elif number[-4:] == i[-4:]:
+                    return '中獎! 五獎1千'
+                    matched = True
+                    break
+                elif number[-3:] == i[-3:]:
+                    return '中獎! 六獎2百'
+                    matched = True
+                    break
+            if not matched:
+                return '沒中...'
+    except:
+        return '輸入錯誤，請重新輸入。'
 
 def extract_invoice_links():
     """擷取表單 2、4、6 的中獎期別與網址"""
@@ -151,7 +189,7 @@ def send_email(name, comment):
     return 0
 
 def currency_rate():
-    url = 'https://rate.b0ot.com.tw/xrt/flcsv/0/day'
+    url = 'https://rate.bot.com.tw/xrt/flcsv/0/day'
     url2 = 'https://rate.bot.com.tw/xrt?Lang=zh-TW'
     try:
         rate = requests.get(url, timeout=10)
