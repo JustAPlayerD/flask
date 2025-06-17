@@ -6,159 +6,177 @@ import email.message
 import smtplib
 import os
 
+# 取得render中的環境參數
 getemailpass = os.environ.get("EMAIL_PASSWORD")
 fromemail = os.environ.get("EMAIL_FROM")
 toemail = os.environ.get("EMAIL_TO")
-
+# 發票對獎網頁
 BASE_URL = 'https://www.etax.nat.gov.tw'
 
 app = Flask(__name__)
-
+# 為裝飾器指定根URL，並且啟用methods中的GET和POST處理HTTP的請求
 @app.route("/", methods=["GET", "POST"])
 def index():
-
+    # 執行取得匯率副程式取得匯率資料
     CRdata = currency_rate()
-    cr_split = []
-    for i in range(1, 20):
-        if i < len(CRdata):
-            cr_split.append(CRdata[i].split(','))
-        else:
-            cr_split.append(["", ""])   # 預設空資料
-
+    # 執行取得取得發票號碼副程式取得發票號碼
     data = get_latest_invoice_numbers()
+    # data為dictionary，因此將資料拆開放入三個矩陣
     numbers = []
     periods = []
     redeem_periods = []
-
     for item in data:
         numbers.extend(item['numbers'])
         periods.append(item['period'])
         redeem_periods.append(item.get('redeem_period', ''))
 
-    numbers += [''] * (15 - len(numbers)) # 3期總共15組號碼
-    periods += [''] * (3 - len(periods)) # 3期年和月份
-    redeem_periods += [''] * (3 - len(redeem_periods)) # 3期兌換期間字串
-
     reply = []
+    # 控制html中回報寄信成功的方塊是否顯示
     success = False
+    # 處理html傳入的表單
     if request.method == "POST":
+        # 取得表單名稱
         action = request.form.get("action")
+        # 回傳的為發票兌獎器的表單
         if action == "check":
+            # 取得在表單內容
             input = request.form.get("inputinvoice")
             month = int(request.form.get("month"))
+            # 執行對發票副程式，返回結果字串
             reply = invoice_check(input, numbers, month)
+        # 回傳的為寄信的表單
         elif action == "comment":
+            # 取得在表單內容
             name = request.form.get("Name")
             comment = request.form.get("Comment")
+            # 執行寄信副程式
             send_email(name, comment)
+            # 回報寄信成功的方塊顯示
             success = True
-
+    # 回傳給html的資料
     return render_template("onepage.html",
-    crt = cr_split,
+    # 匯率資料
+    crt = CRdata,
+    # 各期發票號碼，各期月份字串，各期兌獎期間字串
     invoice = numbers,
     issue = periods,
     redeem = redeem_periods,
+    # 寄信成功的方塊是否顯示，執行對發票副程式後返回的結果字串
     success=success, reply = reply)
 
+# 對發票副程式
 def invoice_check(number, invoice, month):
+    # month為0~2，0為最新一期
+    # invoice含有15組號碼，每期5組，最新一期在前面
     ns = invoice[0+5*month]
     n1 = invoice[1+5*month]
     n2 = [invoice[2+5*month], invoice[3+5*month], invoice[4+5*month]]
+    # 判斷是否為8位數字
     if len(number) != 8:
         return '輸入錯誤，請重新輸入。'
+    # 執行對獎
     try:
         if number == ns:
             return '中獎! 特別獎1000萬'
         elif number == n1:
             return '中獎! 特獎200萬'
         else:
-            matched = False
             for i in n2:
                 if number == i:
                     return '中獎! 頭獎20萬'
-                    matched = True
-                    break
                 elif number[-7:] == i[-7:]:
                     return '中獎! 二獎4萬'
-                    matched = True
-                    break
                 elif number[-6:] == i[-6:]:
                     return '中獎! 三獎1萬'
-                    matched = True
-                    break
                 elif number[-5:] == i[-5:]:
                     return '中獎! 四獎4千'
-                    matched = True
-                    break
                 elif number[-4:] == i[-4:]:
                     return '中獎! 五獎1千'
-                    matched = True
-                    break
                 elif number[-3:] == i[-3:]:
                     return '中獎! 六獎2百'
-                    matched = True
-                    break
-            if not matched:
-                return '沒中...'
+            return '沒中...'
     except:
         return '輸入錯誤，請重新輸入。'
 
+# 取得中獎期別與網址副程式
 def extract_invoice_links():
-    """擷取表單 2、4、6 的中獎期別與網址"""
+    # 擷取表單 2、4、6 的中獎期別與網址
     url = f'{BASE_URL}/etw-main/ETW183W1/'
     response = requests.get(url)
     response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'html.parser')
-
+    # 找所有<tr>
     rows = soup.find_all('tr')
+    # 序號，也就是<th>的文字內容，最新開始共三期
     target_numbers = ['2', '4', '6']
     links = []
 
     for row in rows:
+        # 找到<th scope="row" ...>
         th = row.find('th', scope='row')
+        # 檢查<th>是否為空值並取其中文字，再看文字是否在target_numbers
         if th and th.text.strip() in target_numbers:
+            # 找到其中的<td>
             td = row.find('td')
             if td:
+                # 找到其中的<a>
                 a = td.find('a')
+                # 檢查是否有<a>以及其中的<a>是否有href屬性
                 if a and 'href' in a.attrs:
+                    # 取得連結
                     href = a['href']
+                    # 其中文字為月份資料，將其取出並移除空白
                     text = a.get_text(strip=True)
+                    # 檢查連結開頭有沒有http，有就是完整網址，沒有就補齊
                     full_url = href if href.startswith('http') else BASE_URL + href
+                    # 將月份資料和完整連結組在一起做成tuple
                     links.append((text, full_url))
     return links
-
+# 爬取各期網頁副程式
 def extract_invoice_detail(url):
-    """擷取中獎號碼（紅字8碼）與兌獎期間"""
+    # 擷取中獎號碼（紅字8碼）與兌獎期間
     response = requests.get(url)
     response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    # 擷取紅色 8 碼號碼
+    # 擷取8位數字
+    # 找到<td>且屬性含有color : red、1.6em和bold。
     red_cells = soup.find_all('td', style=re.compile(r'color\s*:\s*red.*1\.6em.*bold'))
     numbers = []
     for td in red_cells:
+        # 取得<td>其中的完整且為數字的8個字
         numbers += re.findall(r'\b\d{8}\b', td.get_text())
-    numbers = list(dict.fromkeys(numbers))[:5]  # 去重、取前 5 組
+    # 只取前5組8位數字，避免取到不是發票號碼的數字
+    numbers = list(dict.fromkeys(numbers))[:5]
 
     # 擷取兌獎期間
     redeem_text = ''
+    # 找到<td>
     tds = soup.find_all('td')
     for td in tds:
+        # 找到文字中含有'領獎期間'的<td>
         if '領獎期間' in td.text:
+            # 取得文字
             text = td.get_text()
+            # 找到'領獎期間自(某年某月某日)起至(某年某月某日)止'的字串
+            # 分為兩組以()為一組將字串存起來
             match = re.search(r'領獎期間自(\d+年\d+月\d+日)起至(\d+年\d+月\d+日)止', text)
             if match:
+                # 兩組內容為啟始時間和結束時間的字串
                 redeem_text = f"{match.group(1)} ~ {match.group(2)}"
             break
 
     return numbers, redeem_text
 
 def get_latest_invoice_numbers():
-    """主功能：擷取表單2, 4, 6的期別與中獎號碼"""
+    # 主功能：擷取表單2, 4, 6的期別與中獎號碼
     result = []
+    # 執行取得中獎期別與網址副程式並取得中獎期別與網址
     links = extract_invoice_links()
     for label, link in links:
+        # 執行爬取各期網頁副程式並取得各期號碼和兌獎期間
         numbers, redeem_period = extract_invoice_detail(link)
+        # 做成含有中獎期別，各期號碼和兌獎期間的dictionary
         result.append({
             'period': label,
             'numbers': numbers,
@@ -166,6 +184,7 @@ def get_latest_invoice_numbers():
         })
     return result
 
+# 寄信副程式
 def send_email(name, comment):
     smtp_server = 'smtp.gmail.com'
     smtp_port = 465
@@ -182,33 +201,26 @@ def send_email(name, comment):
     sever.quit()
     return 0
 
+# 取得匯率副程式
 def currency_rate():
     url = 'https://rate.bot.com.tw/xrt/flcsv/0/day'
-    url2 = 'https://rate.bot.com.tw/xrt?Lang=zh-TW'
+    # 將匯率資料整理成一個二維的list，類似二維矩陣
+    # 總計19種貨幣共19行，每行各列包含貨幣名稱和相關買入賣出等資料共21列
     try:
         rate = requests.get(url, timeout=10)
         rate.encoding = 'utf-8'
         rt = rate.text
+        # 以'\n'為區隔區分出各列
         rts = rt.split('\n')
-        return rts
-    except requests.exceptions.RequestException:
-        try:
-            html = requests.get(url2, timeout=10)
-            soup = BeautifulSoup(html.text, 'html.parser')
-            rows = soup.select('table.table tbody tr')
-            results = ["幣別,0,現金買入,0,0,0,0,0,0,0,0,0,現金賣出"]  # 模擬CSV表頭
-
-            for row in rows:
-                tds = row.find_all('td')
-                if len(tds) >= 5:
-                    currency_name = tds[0].find('div', class_='visible-phone').text.strip()
-                    cash_buy = tds[1].text.strip()
-                    cash_sell = tds[2].text.strip()
-                    results.append(f"{currency_name},0,{cash_buy},0,0,0,0,0,0,0,0,0,{cash_sell}")
-            return results
-        except requests.exceptions.RequestException as e:
-            # 回傳預設資料，避免 Flask crash
-            return [""] * 20  # 保留至少20列空資料
+        cr_split = []
+        # 第一列不取
+        for i in range(1, len(rts)-1):
+            # 每行各列以'，'為區隔
+            cr_split.append(rts[i].split(','))
+        return cr_split
+    except requests.exceptions.RequestException as e:
+        # 網站沒資料時回傳空資料，避免 Flask crash
+        return [[""] * 12] * 19  # 保留至少12行19列空資料
 
 if __name__ == "__main__":
     app.run(debug=True)
