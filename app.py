@@ -112,37 +112,32 @@ def invoice_check(number, invoice, month):
 
 # 取得中獎期別與網址副程式
 def extract_invoice_links():
-    # 擷取表單 2、4、6 的中獎期別與網址
     url = f'{BASE_URL}/etw-main/ETW183W1/'
     response = requests.get(url)
     response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'html.parser')
-    # 找所有<tr>
     rows = soup.find_all('tr')
-    # 序號，也就是<th>的文字內容，最新開始共三期
     target_numbers = ['2', '4', '6']
     links = []
 
     for row in rows:
-        # 找到<th scope="row" ...>
         th = row.find('th', scope='row')
-        # 檢查<th>是否為空值並取其中文字，再看文字是否在target_numbers
         if th and th.text.strip() in target_numbers:
-            # 找到其中的<td>
             td = row.find('td')
             if td:
-                # 找到其中的<a>
                 a = td.find('a')
-                # 檢查是否有<a>以及其中的<a>是否有href屬性
                 if a and 'href' in a.attrs:
-                    # 取得連結
                     href = a['href']
-                    # 其中文字為月份資料，將其取出並移除空白
-                    text = a.get_text(strip=True)
-                    # 檢查連結開頭有沒有http，有就是完整網址，沒有就補齊
+                    raw_text = a.get_text(strip=True)
+                    # 🔹 正則抓 "114年 05 ~ 06"
+                    match = re.search(r'\d{3}年\s*\d{2}\s*~\s*\d{2}', raw_text)
+                    if match:
+                        clean_text = match.group(0)
+                    else:
+                        clean_text = raw_text  # fallback
+
                     full_url = href if href.startswith('http') else BASE_URL + href
-                    # 將月份資料和完整連結組在一起做成tuple
-                    links.append((text, full_url))
+                    links.append((clean_text, full_url))
     return links
 # 爬取各期網頁副程式
 def extract_invoice_detail(url):
@@ -237,5 +232,6 @@ def currency_rate():
 if __name__ == "__main__":
 
     app.run(debug=True)
+
 
 
