@@ -113,7 +113,7 @@ def invoice_check(number, invoice, month):
 # 取得中獎期別與網址副程式
 def extract_invoice_links():
     url = f'{BASE_URL}/etw-main/ETW183W1/'
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
     response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'html.parser')
     rows = soup.find_all('tr')
@@ -128,16 +128,37 @@ def extract_invoice_links():
                 a = td.find('a')
                 if a and 'href' in a.attrs:
                     href = a['href']
-                    raw_text = a.get_text(strip=True)
-                    # 🔹 正則抓 "114年 05 ~ 06"
-                    match = re.search(r'\d{3}年\s*\d{2}\s*~\s*\d{2}', raw_text)
-                    if match:
-                        clean_text = match.group(0)
-                    else:
-                        clean_text = raw_text  # fallback
+                    if "ETW183W2" not in href:   # ⛔ 過濾掉清冊
+                        continue
 
                     full_url = href if href.startswith('http') else BASE_URL + href
-                    links.append((clean_text, full_url))
+                    links.append(full_url)
+
+    return links
+# 新程式覆蓋
+def extract_invoice_links():
+    url = f'{BASE_URL}/etw-main/ETW183W1/'
+    response = requests.get(url, timeout=10)
+    response.encoding = 'utf-8'
+    soup = BeautifulSoup(response.text, 'html.parser')
+    rows = soup.find_all('tr')
+    target_numbers = ['2', '4', '6']
+    links = []
+
+    for row in rows:
+        th = row.find('th', scope='row')
+        if th and th.text.strip() in target_numbers:
+            td = row.find('td')
+            if td:
+                a = td.find('a')
+                if a and 'href' in a.attrs:
+                    href = a['href']
+                    if "ETW183W2" not in href:   # ⛔ 過濾掉清冊
+                        continue
+
+                    full_url = href if href.startswith('http') else BASE_URL + href
+                    links.append(full_url)
+
     return links
 # 爬取各期網頁副程式
 def extract_invoice_detail(url):
@@ -176,20 +197,16 @@ def extract_invoice_detail(url):
     return numbers, redeem_text
 
 def get_latest_invoice_numbers():
-    # 主功能：擷取表單2, 4, 6的期別與中獎號碼
-    result = []
-    # 執行取得中獎期別與網址副程式並取得中獎期別與網址
     links = extract_invoice_links()
-    for label, link in links:
-        # 執行爬取各期網頁副程式並取得各期號碼和兌獎期間
-        numbers, redeem_period = extract_invoice_detail(link)
-        # 做成含有中獎期別，各期號碼和兌獎期間的dictionary
-        result.append({
-            'period': label,
-            'numbers': numbers,
-            'redeem_period': redeem_period
+    all_data = []
+
+    for link in links:
+        nums = fetch_invoice_numbers(link)
+        all_data.append({
+            "numbers": nums,
+            "period": link.split("_")[-1],  # 從網址取期別 (11405 代表114年05-06月)
         })
-    return result
+    return all_data
 
 # 寄信副程式
 def send_email(name, comment):
@@ -232,6 +249,7 @@ def currency_rate():
 if __name__ == "__main__":
 
     app.run(debug=True)
+
 
 
 
