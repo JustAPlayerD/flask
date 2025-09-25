@@ -35,7 +35,7 @@ def index():
 
     # -------- 安全處理：確保 numbers 至少有 8 個元素 --------
     # 你的模板裡至少會用到 invoice[0]~invoice[7]
-    while len(numbers) < 10:
+    while len(numbers) < 20:
         numbers.append("")
     # -------- 安全處理：確保 periods/redeem_periods 對齊 --------
     while len(periods) < 1:
@@ -237,4 +237,5 @@ def currency_rate():
 if __name__ == "__main__":
 
     app.run(debug=True)
+
 
