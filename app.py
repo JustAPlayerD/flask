@@ -19,8 +19,11 @@ app = Flask(__name__)
 def index():
     # 執行取得匯率副程式取得匯率資料
     CRdata = currency_rate()
-    # 執行取得取得發票號碼副程式取得發票號碼
-    data = get_latest_invoice_numbers()
+    try:
+        # 抓發票資料
+        data = get_latest_invoice_numbers()
+    except Exception as e:
+        data = []  # 如果爬資料失敗，至少保持空結構
     # data為dictionary，因此將資料拆開放入三個矩陣
     numbers = []
     periods = []
@@ -30,6 +33,15 @@ def index():
         periods.append(item['period'])
         redeem_periods.append(item.get('redeem_period', ''))
 
+    # -------- 安全處理：確保 numbers 至少有 8 個元素 --------
+    # 你的模板裡至少會用到 invoice[0]~invoice[7]
+    while len(numbers) < 8:
+        numbers.append("")
+    # -------- 安全處理：確保 periods/redeem_periods 對齊 --------
+    while len(periods) < 1:
+        periods.append("")
+    while len(redeem_periods) < 1:
+        redeem_periods.append("")
     reply = []
     # 控制html中回報寄信成功的方塊是否顯示
     success = False
@@ -223,4 +235,5 @@ def currency_rate():
         return [[""] * 12] * 19  # 保留至少12行19列空資料
 
 if __name__ == "__main__":
+
     app.run(debug=True)
