@@ -136,30 +136,18 @@ def extract_invoice_links():
 
     return links
 # 新程式覆蓋
-def extract_invoice_links():
-    url = f'{BASE_URL}/etw-main/ETW183W1/'
+def fetch_invoice_numbers(url):
     response = requests.get(url, timeout=10)
     response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'html.parser')
-    rows = soup.find_all('tr')
-    target_numbers = ['2', '4', '6']
-    links = []
 
-    for row in rows:
-        th = row.find('th', scope='row')
-        if th and th.text.strip() in target_numbers:
-            td = row.find('td')
-            if td:
-                a = td.find('a')
-                if a and 'href' in a.attrs:
-                    href = a['href']
-                    if "ETW183W2" not in href:   # ⛔ 過濾掉清冊
-                        continue
-
-                    full_url = href if href.startswith('http') else BASE_URL + href
-                    links.append(full_url)
-
-    return links
+    numbers = []
+    # 官網結構：每個獎號放在 <span class="etw-tbiggest"> 或 <span class="etw-tnumber">
+    for span in soup.find_all('span', class_=['etw-tbiggest', 'etw-tnumber']):
+        text = span.get_text(strip=True)
+        if text.isdigit() and len(text) == 8:  # 發票號碼必定是8碼
+            numbers.append(text)
+    return numbers
 # 爬取各期網頁副程式
 def extract_invoice_detail(url):
     # 擷取中獎號碼（紅字8碼）與兌獎期間
@@ -249,6 +237,7 @@ def currency_rate():
 if __name__ == "__main__":
 
     app.run(debug=True)
+
 
 
 
